@@ -5,25 +5,26 @@ from dotenv import load_dotenv
 
 # Set Up 
 intents = discord.Intents.default() 
+intents.members = True
 intents.message_content = True 
 
 # Using commands.bot for more features
 # client = discord.Client(intents=intents) 
-bot = commands.Bot(command_prefix='$', intents=intents)
+bot = discord.Bot(intents=intents)
+
+# set up cogs
+cogs_list = [
+    "youtube",
+    "rizz"
+]
+for cog in cogs_list: 
+    bot.load_extension(f"cogs.{cog}")
+    print(f"Loaded cog: {cog}")
 
 @bot.event
 async def on_ready():
     print('We have logged in as {0.user}'.format(bot))
-    try:
-        synced = await bot.tree.sync() 
-        print(f"Synced {len(synced)} commands.") 
-    except Exception as e:
-        print(f"Failed to sync commands: {e}")
 
-@bot.tree.command(name="rizz", description="Let me rizz you up shawtty!")
-async def rizz(interaction: discord.Interaction):
-    await interaction.response.send_message("Hello, world")
- 
 def main(): 
     load_dotenv()
     token = os.getenv("DISCORD_TOKEN") or ""
