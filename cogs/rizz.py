@@ -1,17 +1,23 @@
 import discord 
 from discord.ext import commands
-from transformers import pipeline
+import csv 
+import random
+
+RIZZ_FILE_PATH = "static/brainrot_pickup_lines.csv"
 
 class RizzCog(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot 
-        self.generator = pipeline('text-generation', model='gpt2')
+        self.rizz_file = self.load_csv(RIZZ_FILE_PATH)
+
+    def load_csv(self, filepath):
+        with open(filepath, mode='r', encoding='utf-8') as file: 
+            reader = csv.reader(file)
+            return [row[0] for row in reader]
 
     def generate_rizz(self):
-        prompt = "Write a pickup line sentence."
-        response = self.generator(prompt, max_length=100, num_return_sequences=1)
-        return response[0]['generated_text'].strip()
+        return random.choice(self.rizz_file)
 
     @discord.slash_command(name="rizz", description="Let me rizz you up shawtty!")
     async def rizz(self, ctx):
