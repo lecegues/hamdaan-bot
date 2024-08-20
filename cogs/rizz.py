@@ -30,15 +30,18 @@ class RizzCog(commands.Cog):
     @discord.slash_command(name="rizz",
                            description="Let me rizz you up shawtty!")
     async def rizz(self, ctx):
+        '''Generate a random line from the rizz csv'''
         print("Slash Command: Rizz activated.")
-        await ctx.defer()
+
         rizz_text = self.generate_rizz()
         await ctx.respond(rizz_text)
 
     # ================ EVENTS ================= #
     @commands.Cog.listener()
     async def on_member_join(self, member):
+        '''Generate a random line from the welcome csv'''
         print("Member has joined the server.")
+
         channel = discord.utils.get(member.guild.text_channels, name="welcome")
         if channel:
             welcome_text = self.generate_welcome()
