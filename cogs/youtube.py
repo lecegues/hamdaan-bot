@@ -18,7 +18,17 @@ class YoutubeCog(commands.Cog):
         self.music_queue = []
 
         # YoutubeDL options
-        self.YDL_OPTIONS = {"format": "bestaudio", "noplaylist": "True"}
+        # self.YDL_OPTIONS = {"format": "bestaudio", "noplaylist": "True"}
+        self.YDL_OPTIONS = {
+            "format":
+            "m4a/bestaudio/best",
+            "noplaylist":
+            "True",
+            "postprocessors": [{
+                "key": "FFmpegExtractAudio",
+                "preferredcodec": "m4a",
+            }]
+        }
 
         # FFMPEG options to handle reconnection
         self.FFMPEG_OPTIONS = {
@@ -26,8 +36,7 @@ class YoutubeCog(commands.Cog):
             "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5",
             "options": "-vn -loglevel debug"
         }
-
-    def search_yt(self, query: str) -> dict | bool:
+        '''def search_yt(self, query: str) -> dict | bool:
         """
         Search YouTube with given query
 
@@ -50,6 +59,25 @@ class YoutubeCog(commands.Cog):
                         return {"source": f["url"], "title": info["title"]}
                 print("No audio stream found")
                 return False  # No suitable audio format found
+            except Exception as e:
+                print(e)
+                return False'''
+
+    def search_yt(self, query: str) -> dict | bool:
+        """
+        Search YouTube with given query
+        
+        Returns: dict: {"source": url, "title" title}
+        """
+        with YoutubeDL(self.YDL_OPTIONS) as ydl:
+            try:
+                # perform yt search and extract info from first result without downloading the video
+                info = ydl.extract_info("ytsearch:%s" % query, download=False)
+                if not info:
+                    raise ValueError(f"No results found for {query}")
+                info = info['entries'][0]
+                return {"source": info["url"], "title": info["title"]}
+
             except Exception as e:
                 print(e)
                 return False
